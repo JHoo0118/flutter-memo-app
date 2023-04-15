@@ -5,6 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:memo/components/note_editor.dart';
+import 'package:memo/components/note_toolbar.dart';
 import 'package:memo/constants/constants.dart';
 import 'package:memo/constants/sizes.dart';
 import 'package:memo/layout/default_layout.dart';
@@ -30,6 +32,7 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
   QuillController _controller = QuillController.basic();
   final FocusNode _focusNode = FocusNode();
   bool isKeyboardVisible = false;
+  bool isChanged = false;
   late StreamSubscription<bool> keyboardSubscription;
 
   @override
@@ -47,6 +50,11 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
       });
     });
 
+    _controller.document.changes.listen((event) {
+      setState(() {
+        isChanged = true;
+      });
+    });
     // _controller.document.changes.listen((event) {
     //   var list = event.change.toList();
     //   // ignore: prefer_is_empty
@@ -54,7 +62,7 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
     //     var letter = list[1].data;
     //     if (letter == '/') {
     //       print('pop up menu');
-    //       _showPopupMenu(context, _controller);
+    //       showPopupMenu(context, _controller);
     //     }
     //   }
     // });
@@ -93,7 +101,44 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
     String text = _controller.document.toPlainText();
     ref
         .read(noteDataStateNotifierProvider.notifier)
-        .updateNote(widget.note, text);
+        .updateNote(widget.note, text, isChanged);
+  }
+
+  void showPopupMenu(BuildContext context, QuillController controller) async {
+    await showMenu(
+      context: context,
+      position: const RelativeRect.fromLTRB(100, 100, 100, 100),
+      items: [
+        const PopupMenuItem(
+          value: 1,
+          child: Text("H1 텍스트"),
+        ),
+        const PopupMenuItem(
+          value: 2,
+          child: Text("H2 텍스트"),
+        ),
+        const PopupMenuItem(
+          value: 3,
+          child: Text("H3 텍스트"),
+        ),
+      ],
+      elevation: 8.0,
+    ).then((value) {
+      if (value != null) {
+        // 메뉴 선택 함
+      } else {
+        // 메뉴 선택 안 함
+      }
+    });
+  }
+
+  void onPressed() {
+    if (widget.isNewNote && !_controller.document.isEmpty()) {
+      addNewNote();
+    } else {
+      updateNote();
+    }
+    Navigator.pop(context);
   }
 
   @override
@@ -104,52 +149,10 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
         elevation: 0,
         backgroundColor: Colors.transparent,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () {
-            if (widget.isNewNote && !_controller.document.isEmpty()) {
-              addNewNote();
-            } else {
-              updateNote();
-            }
-            Navigator.pop(context);
-          },
-        ),
+            icon: const Icon(Icons.arrow_back), onPressed: onPressed),
       ),
       bottomSheet: isKeyboardVisible
-          ? SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              child: SizedBox(
-                child: QuillToolbar.basic(
-                  toolbarIconSize: Sizes.size28,
-                  controller: _controller,
-                  showAlignmentButtons: true,
-                  afterButtonPressed: _focusNode.requestFocus,
-                  showCodeBlock: true,
-                  showRedo: false,
-                  showUndo: false,
-                  showCenterAlignment: true,
-                  showColorButton: true,
-                  showDirection: false,
-                  showFontFamily: false,
-                  showDividers: false,
-                  showIndent: false,
-                  showHeaderStyle: true,
-                  showLink: false,
-                  showSearchButton: false,
-                  showInlineCode: false,
-                  showQuote: true,
-                  showListNumbers: false,
-                  showListBullets: false,
-                  showClearFormat: false,
-                  showBoldButton: true,
-                  showFontSize: false,
-                  showItalicButton: true,
-                  showUnderLineButton: true,
-                  showStrikeThrough: true,
-                  showListCheck: true,
-                ),
-              ),
-            )
+          ? NoteToolbar(controller: _controller, focusNode: _focusNode)
           : null,
       child: Column(
         children: [
@@ -158,48 +161,8 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
               padding: const EdgeInsets.all(Sizes.size24),
               child: MouseRegion(
                 cursor: SystemMouseCursors.text,
-                child: QuillEditor(
-                  focusNode: _focusNode,
-                  controller: _controller,
-                  scrollController: ScrollController(),
-                  scrollable: true,
-                  autoFocus: false,
-                  readOnly: false,
-                  placeholder: '메모를 작성해 보세요!',
-                  padding: EdgeInsets.zero,
-                  expands: true,
-                  customStyles: DefaultStyles(
-                    h1: DefaultTextBlockStyle(
-                      const TextStyle(
-                        fontSize: Sizes.size32,
-                        height: 1.15,
-                        fontWeight: FontWeight.w400,
-                      ),
-                      const VerticalSpacing(Sizes.size16, 0),
-                      const VerticalSpacing(0, 0),
-                      null,
-                    ),
-                    h2: DefaultTextBlockStyle(
-                        const TextStyle(
-                          fontSize: Sizes.size24,
-                          height: 1.02,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        const VerticalSpacing(Sizes.size12, 0),
-                        const VerticalSpacing(0, 0),
-                        null),
-                    h3: DefaultTextBlockStyle(
-                        const TextStyle(
-                          fontSize: Sizes.size20,
-                          height: 0.92,
-                          fontWeight: FontWeight.w300,
-                        ),
-                        const VerticalSpacing(Sizes.size8, 0),
-                        const VerticalSpacing(0, 0),
-                        null),
-                    sizeSmall: const TextStyle(fontSize: Sizes.size8),
-                  ),
-                ),
+                child:
+                    NoteEditor(focusNode: _focusNode, controller: _controller),
               ),
             ),
           ),
@@ -207,32 +170,4 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
       ),
     );
   }
-}
-
-void _showPopupMenu(BuildContext context, QuillController controller) async {
-  await showMenu(
-    context: context,
-    position: const RelativeRect.fromLTRB(100, 100, 100, 100),
-    items: [
-      const PopupMenuItem(
-        value: 1,
-        child: Text("H1 텍스트"),
-      ),
-      const PopupMenuItem(
-        value: 2,
-        child: Text("H2 텍스트"),
-      ),
-      const PopupMenuItem(
-        value: 3,
-        child: Text("H3 텍스트"),
-      ),
-    ],
-    elevation: 8.0,
-  ).then((value) {
-    if (value != null) {
-      // 메뉴 선택 함
-    } else {
-      // 메뉴 선택 안 함
-    }
-  });
 }
