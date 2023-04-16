@@ -55,17 +55,6 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
         isChanged = true;
       });
     });
-    // _controller.document.changes.listen((event) {
-    //   var list = event.change.toList();
-    //   // ignore: prefer_is_empty
-    //   if (list.length >= 1) {
-    //     var letter = list[1].data;
-    //     if (letter == '/') {
-    //       print('pop up menu');
-    //       showPopupMenu(context, _controller);
-    //     }
-    //   }
-    // });
   }
 
   @override
@@ -92,8 +81,9 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
     // String text = _controller.document.toPlainText();
     String text =
         jsonEncode(_controller.document.toDelta().toJson()).toString();
+    String plainText = _controller.document.toPlainText();
     ref.read(noteDataStateNotifierProvider.notifier).addNewNote(
-          Note(text: text),
+          Note(text: text, plainText: plainText),
         );
   }
 
@@ -101,9 +91,11 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
   void updateNote() {
     String text =
         jsonEncode(_controller.document.toDelta().toJson()).toString();
+
+    String plainText = _controller.document.toPlainText();
     ref
         .read(noteDataStateNotifierProvider.notifier)
-        .updateNote(widget.note, text, isChanged);
+        .updateNote(widget.note, text, plainText, isChanged);
   }
 
   void showPopupMenu(BuildContext context, QuillController controller) async {

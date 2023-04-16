@@ -13,9 +13,6 @@ class HiveDatabase {
     //   savedNotes(initialNote);
     //   list.add(initialNote);
     // }
-    for (int i = 0; i < list.length; i++) {
-      // list[i].text = jsonDecode(list[i].text);
-    }
     return list;
     // List<Note> savedNotesFormatted = [];
 
@@ -41,7 +38,7 @@ class HiveDatabase {
   }
 
   // save notes
-  void savedNotes(Note note) {
+  void savedNote(Note note) {
     noteList.put(note.id, note);
     // List<Note> allNotesFormatted = [
     //   /*
@@ -68,7 +65,11 @@ class HiveDatabase {
     // }
   }
 
-  void updateNotes(Note note) {
+  void updateNote(Note note) {
     noteList.put(note.id, note);
+  }
+
+  void deleteNote(Note note) {
+    noteList.delete(note.id);
   }
 }

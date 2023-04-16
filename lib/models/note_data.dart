@@ -21,16 +21,17 @@ class NoteDataStateNotifier extends _$NoteDataStateNotifier {
   // add a new note
   void addNewNote(Note note) {
     state = [note, ...state];
-    db.savedNotes(note);
+    db.savedNote(note);
   }
 
   // update note
-  void updateNote(Note note, String text, bool isChanged) {
+  void updateNote(Note note, String text, String plainText, bool isChanged) {
     final List<Note> updatedList = [];
     for (int i = 0; i < state.length; i++) {
       if (state[i].id == note.id && isChanged) {
         final tempNote = state[i];
         tempNote.text = text;
+        tempNote.plainText = plainText;
         tempNote.updatedAt = DateTime.now();
         updatedList.add(tempNote);
       } else {
@@ -38,12 +39,13 @@ class NoteDataStateNotifier extends _$NoteDataStateNotifier {
       }
     }
     _sortByUpdateAt(updatedList);
-    db.updateNotes(note);
+    db.updateNote(note);
   }
 
   // delete note
   void deleteNode(Note note) {
     state = [...state.where((element) => element.id != note.id)];
+    db.deleteNote(note);
   }
 
   void _sortByUpdateAt(List<Note> noteList) {

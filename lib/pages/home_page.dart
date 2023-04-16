@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
@@ -27,7 +29,10 @@ class _HomePageState extends ConsumerState<HomePage> {
 
   void createNewNote() {
     Note newNote = Note(
-      text: '',
+      text: jsonEncode([
+        {"insert": "\n"}
+      ]),
+      plainText: '',
     );
 
     goToNotePage(newNote, true);

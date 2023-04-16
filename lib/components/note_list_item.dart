@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:memo/constants/sizes.dart';
@@ -19,6 +17,11 @@ class NoteListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    QuillController controller = QuillController(
+      document: Document()..insert(0, note.plainText),
+      selection: const TextSelection.collapsed(offset: 0),
+    );
+
     return ListTile(
       leading: Text(
         timeago.format(
@@ -35,13 +38,27 @@ class NoteListItem extends StatelessWidget {
         horizontal: Sizes.size16,
         vertical: Sizes.size16,
       ),
-      title: QuillEditor.basic(
-        controller: QuillController(
-          document: Document.fromJson(jsonDecode(note.text)),
-          selection: const TextSelection.collapsed(offset: 0),
-        ),
-        readOnly: true,
+      title: Text(
+        note.plainText,
+        maxLines: 3,
       ),
+      // QuillEditor(
+      //   focusNode: FocusNode(),
+      //   scrollController: ScrollController(),
+      //   scrollable: true,
+      //   padding: EdgeInsets.zero,
+      //   autoFocus: false,
+      //   expands: false,
+      //   minHeight: 64,
+      //   maxHeight: 64,
+      //   showCursor: false,
+      //   controller: controller,
+      //   readOnly: true,
+      //   onTapUp: (details, p1) {
+      //     goToNotePage();
+      //     return true;
+      //   },
+      // ),
       minLeadingWidth: 60,
       onTap: goToNotePage,
     );

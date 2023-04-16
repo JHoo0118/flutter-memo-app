@@ -7,7 +7,7 @@ part of 'note_data.dart';
 // **************************************************************************
 
 String _$noteDataStateNotifierHash() =>
-    r'f961c7dd2321a7f23d7c286b9f713391e8812b3b';
+    r'30079ee916d89c1f2245b7001e5d94c01a15b449';
 
 /// See also [NoteDataStateNotifier].
 @ProviderFor(NoteDataStateNotifier)

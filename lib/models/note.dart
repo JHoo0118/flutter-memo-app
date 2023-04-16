@@ -10,12 +10,15 @@ class Note {
   @HiveField(1)
   String text;
   @HiveField(2)
+  String plainText;
+  @HiveField(3)
   DateTime updatedAt;
 
   Note({
     String? id,
-    required this.text,
     DateTime? updatedAt,
+    required this.text,
+    required this.plainText,
   })  : updatedAt = updatedAt ?? DateTime.now(),
         id = id ?? const Uuid().v4();
 }
