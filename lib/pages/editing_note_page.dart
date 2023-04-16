@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -7,7 +8,6 @@ import 'package:flutter_quill/flutter_quill.dart' hide Text;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:memo/components/note_editor.dart';
 import 'package:memo/components/note_toolbar.dart';
-import 'package:memo/constants/constants.dart';
 import 'package:memo/constants/sizes.dart';
 import 'package:memo/layout/default_layout.dart';
 
@@ -15,10 +15,10 @@ import 'package:memo/models/note.dart';
 import 'package:memo/models/note_data.dart';
 
 class EditingNotePage extends ConsumerStatefulWidget {
-  Note note;
-  bool isNewNote;
+  final Note note;
+  final bool isNewNote;
 
-  EditingNotePage({
+  const EditingNotePage({
     Key? key,
     required this.note,
     required this.isNewNote,
@@ -76,10 +76,10 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
   }
 
   void loadExistingNote() {
-    final doc = Document()..insert(0, widget.note.text);
+    // final Document doc = Document()..insert(0, widget.note.text);
     setState(() {
       _controller = QuillController(
-        document: doc,
+        document: Document.fromJson(jsonDecode(widget.note.text)),
         selection: const TextSelection.collapsed(offset: 0),
         keepStyleOnNewLine: true,
       );
@@ -89,16 +89,18 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
   // add new note
   void addNewNote() {
     // get text from editor
-    String id = UUID.v4();
-    String text = _controller.document.toPlainText();
+    // String text = _controller.document.toPlainText();
+    String text =
+        jsonEncode(_controller.document.toDelta().toJson()).toString();
     ref.read(noteDataStateNotifierProvider.notifier).addNewNote(
-          Note(id: id, text: text),
+          Note(text: text),
         );
   }
 
   // update existing note
   void updateNote() {
-    String text = _controller.document.toPlainText();
+    String text =
+        jsonEncode(_controller.document.toDelta().toJson()).toString();
     ref
         .read(noteDataStateNotifierProvider.notifier)
         .updateNote(widget.note, text, isChanged);
@@ -147,9 +149,10 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
       backgroundColor: CupertinoColors.darkBackgroundGray,
       appBar: AppBar(
         elevation: 0,
-        backgroundColor: Colors.transparent,
         leading: IconButton(
-            icon: const Icon(Icons.arrow_back), onPressed: onPressed),
+          icon: const Icon(Icons.arrow_back),
+          onPressed: onPressed,
+        ),
       ),
       bottomSheet: isKeyboardVisible
           ? NoteToolbar(controller: _controller, focusNode: _focusNode)

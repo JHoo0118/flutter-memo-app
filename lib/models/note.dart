@@ -1,19 +1,21 @@
-import 'package:json_annotation/json_annotation.dart';
+import 'package:hive/hive.dart';
+import 'package:uuid/uuid.dart';
 
 part 'note.g.dart';
 
-@JsonSerializable()
+@HiveType(typeId: 0)
 class Note {
+  @HiveField(0)
   String id;
+  @HiveField(1)
   String text;
+  @HiveField(2)
   DateTime updatedAt;
 
   Note({
-    required this.id,
+    String? id,
     required this.text,
     DateTime? updatedAt,
-  }) : updatedAt = updatedAt ?? DateTime.now();
-
-  factory Note.fromJson(Map<String, dynamic> json) => _$NoteFromJson(json);
-  Map<String, dynamic> toJson() => _$NoteToJson(this);
+  })  : updatedAt = updatedAt ?? DateTime.now(),
+        id = id ?? const Uuid().v4();
 }

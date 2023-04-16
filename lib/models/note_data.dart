@@ -18,15 +18,10 @@ class NoteDataStateNotifier extends _$NoteDataStateNotifier {
     return db.loadNotes();
   }
 
-  // get notes
-  List<Note> getAllNotes() {
-    _sortByUpdateAt(state);
-    return state;
-  }
-
   // add a new note
   void addNewNote(Note note) {
     state = [note, ...state];
+    db.savedNotes(note);
   }
 
   // update note
@@ -43,6 +38,7 @@ class NoteDataStateNotifier extends _$NoteDataStateNotifier {
       }
     }
     _sortByUpdateAt(updatedList);
+    db.updateNotes(note);
   }
 
   // delete note

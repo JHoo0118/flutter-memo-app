@@ -1,27 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_quill/flutter_quill.dart';
+
 import 'package:memo/constants/sizes.dart';
 
 class NoteEditor extends StatelessWidget {
-  const NoteEditor({
-    super.key,
-    required FocusNode focusNode,
-    required QuillController controller,
-  })  : _focusNode = focusNode,
-        _controller = controller;
+  final FocusNode focusNode;
+  final QuillController controller;
+  final bool readonly;
 
-  final FocusNode _focusNode;
-  final QuillController _controller;
+  const NoteEditor(
+      {super.key,
+      required this.focusNode,
+      required this.controller,
+      bool? readonly})
+      : readonly = readonly ?? false;
 
   @override
   Widget build(BuildContext context) {
     return QuillEditor(
-      focusNode: _focusNode,
-      controller: _controller,
+      focusNode: focusNode,
+      controller: controller,
       scrollController: ScrollController(),
       scrollable: true,
       autoFocus: false,
-      readOnly: false,
+      readOnly: readonly,
       placeholder: '메모를 작성해 보세요!',
       padding: EdgeInsets.zero,
       expands: true,

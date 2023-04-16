@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+
 import 'package:memo/components/note_empty.dart';
-import 'package:memo/constants/constants.dart';
-import 'package:memo/constants/sizes.dart';
+import 'package:memo/components/note_list_item.dart';
 import 'package:memo/layout/default_layout.dart';
 import 'package:memo/models/note.dart';
 import 'package:memo/models/note_data.dart';
 import 'package:memo/pages/editing_note_page.dart';
 import 'package:memo/theme/theme_provider.dart';
-import 'package:memo/utils/my_custom_messages.dart';
-import 'package:timeago/timeago.dart' as timeago;
 
 enum Actions { share, delete, archive }
 
@@ -25,13 +23,10 @@ class _HomePageState extends ConsumerState<HomePage> {
   @override
   void initState() {
     super.initState();
-    timeago.setLocaleMessages('ko', MyCustomMessages());
   }
 
   void createNewNote() {
-    String id = UUID.v4();
     Note newNote = Note(
-      id: id,
       text: '',
     );
 
@@ -54,24 +49,24 @@ class _HomePageState extends ConsumerState<HomePage> {
     ref.watch(noteDataStateNotifierProvider.notifier).deleteNode(note);
   }
 
-  void onDismissed(int index, Actions action) {
+  void onDismissed(Note note, Actions action) {
     if (action == Actions.delete) {
-      // deleteNote(memo);
+      deleteNote(note);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final memoList = ref.watch(noteDataStateNotifierProvider);
+    final noteList = ref.watch(noteDataStateNotifierProvider);
     // Theme.of(context).primaryColor;
     return DefaultLayout(
       floatingActionButton: FloatingActionButton(
         onPressed: createNewNote,
-        elevation: 0,
-        backgroundColor: Colors.grey[300],
+        elevation: 5,
+        backgroundColor: Pallete.primaryColor,
         child: const Icon(
           Icons.add,
-          color: Colors.grey,
+          color: Pallete.whiteColor,
         ),
       ),
       appBar: AppBar(
@@ -90,13 +85,13 @@ class _HomePageState extends ConsumerState<HomePage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          memoList.isEmpty
+          noteList.isEmpty
               ? const NoteEmpty()
               : Expanded(
                   child: ListView.separated(
-                    itemCount: memoList.length,
+                    itemCount: noteList.length,
                     itemBuilder: (context, index) {
-                      final memo = memoList[index];
+                      final note = noteList[index];
                       return Slidable(
                         startActionPane: ActionPane(
                           motion: const StretchMotion(),
@@ -106,14 +101,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                               icon: Icons.share,
                               label: '공유',
                               onPressed: (context) =>
-                                  onDismissed(index, Actions.share),
+                                  onDismissed(note, Actions.share),
                             ),
                             SlidableAction(
                               backgroundColor: Colors.blue,
                               icon: Icons.archive,
                               label: '아카이브',
                               onPressed: (context) =>
-                                  onDismissed(index, Actions.archive),
+                                  onDismissed(note, Actions.archive),
                             ),
                           ],
                         ),
@@ -121,36 +116,17 @@ class _HomePageState extends ConsumerState<HomePage> {
                           motion: const BehindMotion(),
                           children: [
                             SlidableAction(
-                                backgroundColor: Colors.red,
-                                icon: Icons.delete,
-                                label: '삭제',
-                                onPressed: (context) =>
-                                    onDismissed(index, Actions.delete)),
+                              backgroundColor: Colors.red,
+                              icon: Icons.delete,
+                              label: '삭제',
+                              onPressed: (context) =>
+                                  onDismissed(note, Actions.delete),
+                            ),
                           ],
                         ),
-                        child: ListTile(
-                          leading: Text(
-                            timeago.format(
-                              memo.updatedAt,
-                              locale: 'ko',
-                            ),
-                            style: TextStyle(
-                              color: Theme.of(context).brightness ==
-                                      Brightness.dark
-                                  ? Pallete.placeholderColor
-                                  : Pallete.darkColor,
-                            ),
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: Sizes.size16,
-                            vertical: Sizes.size16,
-                          ),
-                          title: Text(
-                            memo.text,
-                            maxLines: 3,
-                          ),
-                          minLeadingWidth: 60,
-                          onTap: () => goToNotePage(memo, false),
+                        child: NoteListItem(
+                          note: note,
+                          goToNotePage: () => goToNotePage(note, false),
                         ),
                       );
                     },
