@@ -11,6 +11,7 @@ import 'package:memo/models/note.dart';
 import 'package:memo/models/note_data.dart';
 import 'package:memo/pages/editing_note_page.dart';
 import 'package:memo/theme/theme_provider.dart';
+import 'package:share_plus/share_plus.dart';
 
 enum Actions { share, delete, archive }
 
@@ -57,6 +58,8 @@ class _HomePageState extends ConsumerState<HomePage> {
   void onDismissed(Note note, Actions action) {
     if (action == Actions.delete) {
       deleteNote(note);
+    } else if (action == Actions.share) {
+      Share.share(note.plainText);
     }
   }
 
@@ -108,13 +111,13 @@ class _HomePageState extends ConsumerState<HomePage> {
                               onPressed: (context) =>
                                   onDismissed(note, Actions.share),
                             ),
-                            SlidableAction(
-                              backgroundColor: Colors.blue,
-                              icon: Icons.archive,
-                              label: '아카이브',
-                              onPressed: (context) =>
-                                  onDismissed(note, Actions.archive),
-                            ),
+                            // SlidableAction(
+                            //   backgroundColor: Colors.blue,
+                            //   icon: Icons.archive,
+                            //   label: '아카이브',
+                            //   onPressed: (context) =>
+                            //       onDismissed(note, Actions.archive),
+                            // ),
                           ],
                         ),
                         endActionPane: ActionPane(
@@ -149,14 +152,14 @@ class _HomePageState extends ConsumerState<HomePage> {
                     },
                   ),
                 ),
-          Center(
-            child: ElevatedButton(
-              onPressed: () {
-                ref.read(themeStateNotifierProvider.notifier).toggleTheme();
-              },
-              child: const Text('테마'),
-            ),
-          ),
+          // Center(
+          //   child: ElevatedButton(
+          //     onPressed: () {
+          //       ref.read(themeStateNotifierProvider.notifier).toggleTheme();
+          //     },
+          //     child: const Text('테마'),
+          //   ),
+          // ),
         ],
       ),
     );
