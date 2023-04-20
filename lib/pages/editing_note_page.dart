@@ -127,7 +127,9 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
   }
 
   void onPressed() {
-    if (widget.isNewNote && !_controller.document.isEmpty()) {
+    final text = _controller.document.toPlainText();
+    if (widget.isNewNote &&
+        (text.isNotEmpty || text.length == 1 && text[0] != '\n')) {
       addNewNote();
     } else {
       updateNote();

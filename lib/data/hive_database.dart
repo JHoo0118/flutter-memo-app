@@ -8,6 +8,10 @@ class HiveDatabase {
   // load notes
   List<Note> loadNotes() {
     List<Note> list = noteList.values.toList();
+    if (list.isNotEmpty) {
+      list = list
+        ..sort((noteA, noteB) => noteB.updatedAt.compareTo(noteA.updatedAt));
+    }
     // if (list.isEmpty) {
     //   Note initialNote = Note(text: r'{"insert":"hello\n"}');
     //   savedNotes(initialNote);

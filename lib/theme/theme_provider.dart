@@ -37,6 +37,7 @@ class Pallete {
     appBarTheme: const AppBarTheme(
       backgroundColor: Colors.transparent,
       systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: blackColor,
         statusBarIconBrightness: Brightness.dark,
         statusBarBrightness: Brightness.dark,
       ),
@@ -57,6 +58,7 @@ class Pallete {
         color: darkColor,
       ),
       systemOverlayStyle: SystemUiOverlayStyle(
+        statusBarColor: blackColor,
         systemNavigationBarColor: darkColor,
         statusBarIconBrightness: Brightness.light,
         statusBarBrightness: Brightness.light,
