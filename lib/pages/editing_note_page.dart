@@ -127,11 +127,10 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
   }
 
   void onPressed() {
-    final text = _controller.document.toPlainText();
     if (widget.isNewNote &&
-        (text.isNotEmpty || text.length == 1 && text[0] != '\n')) {
+        _controller.document.toPlainText().trim().isNotEmpty) {
       addNewNote();
-    } else {
+    } else if (_controller.document.toPlainText().trim().isNotEmpty) {
       updateNote();
     }
     Navigator.pop(context);
