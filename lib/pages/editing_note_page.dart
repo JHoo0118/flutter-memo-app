@@ -138,31 +138,37 @@ class _EditingNotePageState extends ConsumerState<EditingNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return DefaultLayout(
-      backgroundColor: CupertinoColors.darkBackgroundGray,
-      appBar: AppBar(
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: onPressed,
+    return WillPopScope(
+      onWillPop: () async {
+        onPressed();
+        return true;
+      },
+      child: DefaultLayout(
+        backgroundColor: CupertinoColors.darkBackgroundGray,
+        appBar: AppBar(
+          elevation: 0,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: onPressed,
+          ),
         ),
-      ),
-      bottomSheet: isKeyboardVisible
-          ? NoteToolbar(controller: _controller, focusNode: _focusNode)
-          : null,
-      child: Column(
-        children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.all(Sizes.size24),
-              child: MouseRegion(
-                cursor: SystemMouseCursors.text,
-                child:
-                    NoteEditor(focusNode: _focusNode, controller: _controller),
+        bottomSheet: isKeyboardVisible
+            ? NoteToolbar(controller: _controller, focusNode: _focusNode)
+            : null,
+        child: Column(
+          children: [
+            Expanded(
+              child: Container(
+                padding: const EdgeInsets.all(Sizes.size24),
+                child: MouseRegion(
+                  cursor: SystemMouseCursors.text,
+                  child: NoteEditor(
+                      focusNode: _focusNode, controller: _controller),
+                ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
